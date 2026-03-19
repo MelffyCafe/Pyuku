@@ -133,41 +133,75 @@ document.addEventListener('DOMContentLoaded', function() {
         window.showChapter(1);
     }
 
-    // JUMP TO TOP - SHOW AFTER TABLE OF CONTENTS
+    // JUMP TO TOP - IMPROVED FOR iOS
     const jumpBtn = document.getElementById('jumpToTop');
     const tocContainer = document.querySelector('.toc-container');
     
     if (jumpBtn) {
+        // Method 1: Scroll event with requestAnimationFrame for performance
+        let ticking = false;
         function checkScroll() {
             if (tocContainer) {
-                // Get the position of the Table of Contents
                 const tocRect = tocContainer.getBoundingClientRect();
                 
-                // Show button when we've scrolled past the Table of Contents
-                // (when the bottom of TOC is above the viewport)
-                if (tocRect.bottom < 0) {
+                // Show button when TOC is scrolled past OR after 200px of scrolling
+                if (tocRect.bottom < 0 || window.scrollY > 200) {
                     jumpBtn.classList.remove('hidden');
                 } else {
                     jumpBtn.classList.add('hidden');
                 }
             } else {
-                // Fallback: show after 300px of scrolling
-                if (window.scrollY > 300) {
+                // Fallback
+                if (window.scrollY > 200) {
                     jumpBtn.classList.remove('hidden');
                 } else {
                     jumpBtn.classList.add('hidden');
                 }
             }
+            ticking = false;
         }
         
-        // Check on scroll
-        window.addEventListener('scroll', checkScroll);
+        // Optimized scroll listener
+        window.addEventListener('scroll', function() {
+            if (!ticking) {
+                window.requestAnimationFrame(checkScroll);
+                ticking = true;
+            }
+        });
         
-        // Check on page load
+        // Method 2: Intersection Observer as backup (more reliable on iOS)
+        if (tocContainer && window.IntersectionObserver) {
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(function(entry) {
+                    // If TOC is NOT intersecting (scrolled past), show button
+                    if (!entry.isIntersecting && entry.boundingClientRect.bottom < 0) {
+                        jumpBtn.classList.remove('hidden');
+                    } else if (entry.isIntersecting) {
+                        jumpBtn.classList.add('hidden');
+                    }
+                });
+            }, {
+                threshold: 0,
+                rootMargin: "0px"
+            });
+            
+            observer.observe(tocContainer);
+        }
+        
+        // Method 3: Periodic check as final fallback for iOS
+        setInterval(function() {
+            if (tocContainer) {
+                const tocRect = tocContainer.getBoundingClientRect();
+                if (tocRect.bottom < 0 || window.scrollY > 200) {
+                    jumpBtn.classList.remove('hidden');
+                } else {
+                    jumpBtn.classList.add('hidden');
+                }
+            }
+        }, 200); // Check every 200ms
+        
+        // Initial check
         checkScroll();
-        
-        // Check when window resizes
-        window.addEventListener('resize', checkScroll);
         
         // Click to go to top
         jumpBtn.addEventListener('click', function() {
