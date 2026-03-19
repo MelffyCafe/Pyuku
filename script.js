@@ -133,84 +133,76 @@ document.addEventListener('DOMContentLoaded', function() {
         window.showChapter(1);
     }
 
-    // JUMP TO TOP - IMPROVED FOR iOS
-    const jumpBtn = document.getElementById('jumpToTop');
-    const tocContainer = document.querySelector('.toc-container');
-    
-    if (jumpBtn) {
-        // Method 1: Scroll event with requestAnimationFrame for performance
-        let ticking = false;
-        function checkScroll() {
-            if (tocContainer) {
-                const tocRect = tocContainer.getBoundingClientRect();
-                
-                // Show button when TOC is scrolled past OR after 200px of scrolling
-                if (tocRect.bottom < 0 || window.scrollY > 200) {
-                    jumpBtn.classList.remove('hidden');
-                } else {
-                    jumpBtn.classList.add('hidden');
-                }
-            } else {
-                // Fallback
-                if (window.scrollY > 200) {
-                    jumpBtn.classList.remove('hidden');
-                } else {
-                    jumpBtn.classList.add('hidden');
-                }
-            }
-            ticking = false;
-        }
+// JUMP TO TOP - IMPROVED FOR iOS WITH URL BAR FIX
+const jumpBtn = document.getElementById('jumpToTop');
+const tocContainer = document.querySelector('.toc-container');
+let lastScrollY = window.scrollY;
+let ticking = false;
+
+if (jumpBtn) {
+    function checkScroll() {
+        const currentScrollY = window.scrollY;
         
-        // Optimized scroll listener
-        window.addEventListener('scroll', function() {
-            if (!ticking) {
-                window.requestAnimationFrame(checkScroll);
-                ticking = true;
-            }
-        });
-        
-        // Method 2: Intersection Observer as backup (more reliable on iOS)
-        if (tocContainer && window.IntersectionObserver) {
-            const observer = new IntersectionObserver(function(entries) {
-                entries.forEach(function(entry) {
-                    // If TOC is NOT intersecting (scrolled past), show button
-                    if (!entry.isIntersecting && entry.boundingClientRect.bottom < 0) {
-                        jumpBtn.classList.remove('hidden');
-                    } else if (entry.isIntersecting) {
-                        jumpBtn.classList.add('hidden');
-                    }
-                });
-            }, {
-                threshold: 0,
-                rootMargin: "0px"
-            });
+        if (tocContainer) {
+            const tocRect = tocContainer.getBoundingClientRect();
             
-            observer.observe(tocContainer);
-        }
-        
-        // Method 3: Periodic check as final fallback for iOS
-        setInterval(function() {
-            if (tocContainer) {
-                const tocRect = tocContainer.getBoundingClientRect();
-                if (tocRect.bottom < 0 || window.scrollY > 200) {
-                    jumpBtn.classList.remove('hidden');
-                } else {
-                    jumpBtn.classList.add('hidden');
-                }
+            // On iOS, when URL bar collapses, scrollY changes
+            // Use multiple conditions to catch it
+            const isPastTOC = tocRect.bottom < 50; // Small threshold for URL bar
+            const hasScrolledSignificantly = currentScrollY > 200;
+            const scrollDirection = currentScrollY > lastScrollY ? 'down' : 'up';
+            
+            // Show button if past TOC OR scrolled down significantly
+            if (isPastTOC || (hasScrolledSignificantly && scrollDirection === 'down')) {
+                jumpBtn.classList.remove('hidden');
+            } else {
+                jumpBtn.classList.add('hidden');
             }
-        }, 200); // Check every 200ms
-        
-        // Initial check
-        checkScroll();
-        
-        // Click to go to top
-        jumpBtn.addEventListener('click', function() {
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
-        });
+            
+            lastScrollY = currentScrollY;
+        } else {
+            // Fallback
+            if (window.scrollY > 200) {
+                jumpBtn.classList.remove('hidden');
+            } else {
+                jumpBtn.classList.add('hidden');
+            }
+        }
+        ticking = false;
     }
+    
+    // Scroll event with requestAnimationFrame
+    window.addEventListener('scroll', function() {
+        if (!ticking) {
+            window.requestAnimationFrame(checkScroll);
+            ticking = true;
+        }
+    });
+    
+    // Also check on touch end for iOS
+    window.addEventListener('touchend', function() {
+        checkScroll();
+    });
+    
+    // Check on resize (when URL bar collapses/expands)
+    window.addEventListener('resize', function() {
+        checkScroll();
+    });
+    
+    // Periodic check for iOS
+    setInterval(checkScroll, 100);
+    
+    // Initial check
+    checkScroll();
+    
+    // Click handler
+    jumpBtn.addEventListener('click', function() {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+}
 });
 
 // iOS viewport height fix
