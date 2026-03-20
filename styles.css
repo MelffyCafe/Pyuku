@@ -203,6 +203,16 @@ body {
     z-index: 1000;
     transition: 0.15s;
     opacity: 0.8;
+    
+    /* Touch-friendly improvements */
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    user-select: none;
 }
 
 #jumpToTop:hover {
@@ -210,8 +220,25 @@ body {
     opacity: 1;
 }
 
+#jumpToTop:active {
+    transform: scale(0.95);
+    opacity: 1;
+    background: var(--toc-hover);
+}
+
 #jumpToTop.hidden {
     display: none;
+}
+
+@media (max-width: 600px) {
+    #jumpToTop {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+        bottom: max(20px, env(safe-area-inset-bottom, 20px));
+        right: max(20px, env(safe-area-inset-right, 20px));
+        min-width: 44px;
+        min-height: 44px;
+    }
 }
 
 /* Ensure the main container doesn't cause issues */
@@ -228,32 +255,6 @@ body {
     box-shadow: var(--shadow);
     /* Ensure it doesn't overflow */
     box-sizing: border-box;
-}
-
-@media (max-width: 600px) {
-    .doc-column {
-        padding: 1.8rem 1.2rem;
-        padding-bottom: calc(1.8rem + env(safe-area-inset-bottom, 0));
-        margin-top: 70px;
-        margin-bottom: calc(30px + env(safe-area-inset-bottom, 0));
-    }
-    
-    #darkmode-toggle {
-        padding: 0.5rem 1rem;
-        font-size: 0.9rem;
-    }
-    
-    #jumpToTop {
-        padding: 0.5rem 1rem;
-        font-size: 0.9rem;
-        bottom: max(20px, env(safe-area-inset-bottom, 20px));
-        right: max(20px, env(safe-area-inset-right, 20px));
-    }
-    
-    /* Add extra bottom padding on mobile */
-    body {
-        padding-bottom: max(20px, env(safe-area-inset-bottom, 20px));
-    }
 }
 
 .story-header {

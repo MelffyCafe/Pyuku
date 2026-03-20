@@ -189,7 +189,7 @@ document.addEventListener('DOMContentLoaded', function() {
         window.showChapter(1);
     }
 
-    // JUMP TO TOP - IMPROVED FOR iOS
+    // JUMP TO TOP - FIXED FOR MOBILE
     const jumpBtn = document.getElementById('jumpToTop');
     const tocContainer = document.querySelector('.toc-container');
     let lastScrollY = window.scrollY;
@@ -241,13 +241,38 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(checkScroll, 100);
         checkScroll();
         
-        // Click handler
-        jumpBtn.addEventListener('click', function() {
+        // FIXED CLICK HANDLER - works on mobile
+        jumpBtn.addEventListener('click', function(e) {
+            e.preventDefault(); // Prevent any default behavior
+            
+            // Force hide the button immediately for better UX
+            jumpBtn.classList.add('hidden');
+            
+            // Scroll to top
             window.scrollTo({
                 top: 0,
                 behavior: 'smooth'
             });
+            
+            return false; // Prevent event bubbling
         });
+        
+        // ADD TOUCH EVENT specifically for mobile
+        jumpBtn.addEventListener('touchstart', function(e) {
+            e.preventDefault(); // Prevent default touch behavior
+            e.stopPropagation(); // Stop event bubbling
+            
+            // Force hide the button immediately
+            jumpBtn.classList.add('hidden');
+            
+            // Scroll to top
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+            
+            return false;
+        }, { passive: false }); // Important: passive: false allows preventDefault
     }
     
     // Apply Safari bottom bar fix after load
