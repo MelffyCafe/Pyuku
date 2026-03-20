@@ -60,6 +60,7 @@
     --blur-amount: 6px;
     --vh: 100%;
     --safe-bottom: env(safe-area-inset-bottom, 0);
+    color-scheme: light dark;
 }
 
 /* Light mode overrides - applied when body has 'light' class */
@@ -126,10 +127,12 @@ body {
 
 body.light {
     background-image: url('assets/lightmodetree.jpg');
+    color-scheme: light;
 }
 
 body.dark {
     background-image: url('assets/darkmodeland.jpg');
+    color-scheme: dark;
 }
 
 /* Edge-specific fix */

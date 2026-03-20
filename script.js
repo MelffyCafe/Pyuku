@@ -54,15 +54,21 @@ function updateDarkMode(isDark) {
         document.body.classList.remove('light');
         document.body.classList.add('dark');
         
-        // Update body background, not html
+        // Update body background
         document.body.style.backgroundImage = "url('assets/darkmodeland.jpg')";
+        
+        // Update theme-color meta tag for Safari
+        updateThemeColor('#0a0e1a');
     } else {
         // Light mode
         document.body.classList.add('light');
         document.body.classList.remove('dark');
         
-        // Update body background, not html
+        // Update body background
         document.body.style.backgroundImage = "url('assets/lightmodetree.jpg')";
+        
+        // Update theme-color meta tag for Safari
+        updateThemeColor('#e0e6f0');
     }
     
     // Set background properties on body
@@ -82,6 +88,32 @@ function updateDarkMode(isDark) {
         document.body.style.backgroundAttachment = window.innerWidth > 600 ? 'fixed' : 'scroll';
     }
 }
+
+// Add this new function to update theme color
+function updateThemeColor(color) {
+    let metaThemeColor = document.querySelector('meta[name=theme-color]');
+    
+    if (!metaThemeColor) {
+        metaThemeColor = document.createElement('meta');
+        metaThemeColor.name = 'theme-color';
+        document.head.appendChild(metaThemeColor);
+    }
+    
+    metaThemeColor.content = color;
+}
+
+// Call it in your DOMContentLoaded
+document.addEventListener('DOMContentLoaded', function() {
+    // ... your existing code ...
+    
+    // Set initial theme color based on saved mode
+    const savedMode = localStorage.getItem('darkMode');
+    if (savedMode === 'light') {
+        updateThemeColor('#e0e6f0');
+    } else {
+        updateThemeColor('#0a0e1a');
+    }
+});
 
 // iOS Safari bottom bar fix - improved
 function fixSafariBottomBar() {
