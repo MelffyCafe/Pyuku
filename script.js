@@ -2,7 +2,7 @@
 window.currentChapter = 1;
 
 // Function to show a specific chapter
-window.showChapter = function(num) {
+window.showChapter = function(num, scrollToChapter = true) {
     // Hide all chapters
     for (let i = 1; i <= 10; i++) {
         let chapter = document.getElementById('chapter' + i);
@@ -11,7 +11,22 @@ window.showChapter = function(num) {
     
     // Show selected chapter
     let selectedChapter = document.getElementById('chapter' + num);
-    if (selectedChapter) selectedChapter.style.display = 'block';
+    if (selectedChapter) {
+        selectedChapter.style.display = 'block';
+        
+        // Scroll to the chapter title if requested
+        if (scrollToChapter) {
+            const chapterTitle = selectedChapter.querySelector('.chapter-title');
+            if (chapterTitle) {
+                setTimeout(() => {
+                    chapterTitle.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'start'
+                    });
+                }, 50);
+            }
+        }
+    }
     
     // Update active class in TOC - WORKS WITH YOUR BUTTON ORDER
     document.querySelectorAll('.chapter-link').forEach((btn) => {
@@ -191,13 +206,13 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Body has light class?', document.body.classList.contains('light'));
     console.log('=== END DIAGNOSIS ===\n');
 
-    // Load last chapter
-    const savedChapter = localStorage.getItem('currentChapter');
-    if (savedChapter) {
-        window.showChapter(parseInt(savedChapter));
-    } else {
-        window.showChapter(1);
-    }
+// Load last chapter - pass false to NOT scroll (start at top)
+const savedChapter = localStorage.getItem('currentChapter');
+if (savedChapter) {
+    window.showChapter(parseInt(savedChapter), false);
+} else {
+    window.showChapter(1, false);
+}
 
 // JUMP TO TOP - FIXED FOR MOBILE using scrollingElement
 const jumpBtn = document.getElementById('jumpToTop');
