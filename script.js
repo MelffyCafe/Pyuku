@@ -71,7 +71,7 @@ function updateDarkMode(isDark) {
     // Ensure background properties are set
     document.documentElement.style.backgroundSize = 'cover';
     document.documentElement.style.backgroundPosition = 'center';
-    document.documentElement.style.backgroundAttachment = 'scroll'; // Changed from fixed to scroll
+    document.documentElement.style.backgroundAttachment = 'scroll';
 }
 
 // iOS viewport height fix - SIMPLIFIED

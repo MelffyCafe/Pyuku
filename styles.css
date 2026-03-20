@@ -122,30 +122,34 @@ body {
     -webkit-align-items: center;
 }
 
-/* iOS-specific viewport fixes */
+/* iOS-specific viewport fixes - PROVEN FIX */
 @supports (-webkit-touch-callout: none) {
     html {
-        height: -webkit-fill-available;
-        /* Fix for background on iOS */
+        height: 100dvh;
+        overflow: hidden;
         background-attachment: scroll;
     }
     
     body {
-        /* The key fix for iOS bottom cut-off */
-        height: -webkit-fill-available;
-        min-height: -webkit-fill-available;
-        /* Use padding instead of height for content */
-        padding: 0 1rem 2rem 1rem; /* Increased bottom padding */
+        height: 100dvh;
+        overscroll-behavior: contain;
+        overflow-y: scroll;
+        -webkit-overflow-scrolling: touch;
+        padding: 0 1rem 1rem 1rem;
+        /* Add safe area padding if needed */
+        padding-bottom: env(safe-area-inset-bottom, 1rem);
     }
     
-    /* Ensure the last content is visible */
-    .chapter-nav {
-        padding-bottom: 3rem;
+    /* Ensure fixed elements stay put */
+    .top-button-bar {
+        position: fixed;
+        top: max(20px, env(safe-area-inset-top));
+        right: max(20px, env(safe-area-inset-right));
     }
     
-    /* Fix for jump to button on iOS */
     #jumpToTop {
-        bottom: 40px; /* Slightly higher to account for safe area */
+        bottom: max(30px, env(safe-area-inset-bottom));
+        right: max(30px, env(safe-area-inset-right));
     }
 }
 
@@ -396,21 +400,4 @@ body.dark .chapter-link:hover {
 
 .mono-text {
     font-family: 'Syne Mono', monospace;
-}
-
-/* Extra iOS bottom spacing */
-@media (max-width: 600px) {
-    @supports (-webkit-touch-callout: none) {
-        .doc-column {
-            margin-bottom: 40px;
-        }
-        
-        .chapter-nav {
-            padding-bottom: 3.5rem;
-        }
-        
-        body {
-            padding-bottom: 30px;
-        }
-    }
 }
