@@ -189,74 +189,80 @@ document.addEventListener('DOMContentLoaded', function() {
         window.showChapter(1);
     }
 
-    // ============= JUMP TO TOP - REPLACED WITH ANCHOR VERSION =============
-    const jumpBtn = document.getElementById('jumpToTop');
-    const tocContainer = document.querySelector('.toc-container');
-    let ticking = false;
+// JUMP TO TOP - FIXED FOR MOBILE using scrollingElement
+const jumpBtn = document.getElementById('jumpToTop');
+const tocContainer = document.querySelector('.toc-container');
+let lastScrollY = window.scrollY;
+let ticking = false;
 
-    if (jumpBtn) {
-        function checkScroll() {
-            // Use scrollingElement for better mobile compatibility
-            const scrollTop = document.scrollingElement ? document.scrollingElement.scrollTop : window.scrollY;
+if (jumpBtn) {
+    function checkScroll() {
+        // Use scrollingElement for better mobile compatibility
+        const scrollTop = document.scrollingElement ? document.scrollingElement.scrollTop : window.scrollY;
+        
+        if (tocContainer) {
+            const tocRect = tocContainer.getBoundingClientRect();
             
-            if (tocContainer) {
-                const tocRect = tocContainer.getBoundingClientRect();
-                
-                // Use a more generous threshold for iOS
-                const isPastTOC = tocRect.bottom < 100;
-                const hasScrolledSignificantly = scrollTop > 150;
-                
-                if (isPastTOC || hasScrolledSignificantly) {
-                    jumpBtn.classList.remove('hidden');
-                } else {
-                    jumpBtn.classList.add('hidden');
-                }
+            // Use a more generous threshold for iOS
+            const isPastTOC = tocRect.bottom < 100;
+            const hasScrolledSignificantly = scrollTop > 150;
+            
+            if (isPastTOC || hasScrolledSignificantly) {
+                jumpBtn.classList.remove('hidden');
             } else {
-                if (scrollTop > 150) {
-                    jumpBtn.classList.remove('hidden');
-                } else {
-                    jumpBtn.classList.add('hidden');
-                }
+                jumpBtn.classList.add('hidden');
             }
-            ticking = false;
+        } else {
+            if (scrollTop > 150) {
+                jumpBtn.classList.remove('hidden');
+            } else {
+                jumpBtn.classList.add('hidden');
+            }
         }
-        
-        // Multiple event listeners for iOS
-        window.addEventListener('scroll', function() {
-            if (!ticking) {
-                window.requestAnimationFrame(checkScroll);
-                ticking = true;
-            }
-        });
-        
-        window.addEventListener('touchend', checkScroll);
-        window.addEventListener('resize', checkScroll);
-        
-        // Periodic check for iOS
-        setInterval(checkScroll, 200);
-        
-        // Initial check with delay to ensure DOM is ready
-        setTimeout(checkScroll, 100);
-        checkScroll();
-        
-        // SIMPLE CLICK HANDLER - Let the anchor do the work
-        // No JavaScript scroll code needed anymore!
-        jumpBtn.addEventListener('click', function(e) {
-            // The href="#top-of-page" will handle scrolling naturally
-            // We just need to make sure the button hides
-            setTimeout(function() {
-                jumpBtn.classList.add('hidden');
-            }, 100);
-        });
-        
-        // Touch event for mobile
-        jumpBtn.addEventListener('touchstart', function(e) {
-            // Let the anchor handle it
-            setTimeout(function() {
-                jumpBtn.classList.add('hidden');
-            }, 100);
-        }, { passive: false });
+        ticking = false;
     }
+    
+    // Multiple event listeners for iOS
+    window.addEventListener('scroll', function() {
+        if (!ticking) {
+            window.requestAnimationFrame(checkScroll);
+            ticking = true;
+        }
+    });
+    
+    window.addEventListener('touchend', checkScroll);
+    window.addEventListener('resize', checkScroll);
+    
+    // Periodic check for iOS
+    setInterval(checkScroll, 200);
+    
+    // Initial check with delay to ensure DOM is ready
+    setTimeout(checkScroll, 100);
+    checkScroll();
+    
+    // FIXED CLICK HANDLER - REMOVED preventDefault()
+    jumpBtn.addEventListener('click', function(e) {
+        // DO NOT use e.preventDefault() - let the anchor do its job
+        
+        // Hide button
+        jumpBtn.classList.add('hidden');
+        
+        // Let the anchor href="#top-of-page" handle scrolling naturally
+        // No manual scroll code needed
+        
+        return true; // Allow default behavior
+    });
+    
+    // FIXED TOUCH EVENT - REMOVED preventDefault()
+    jumpBtn.addEventListener('touchstart', function(e) {
+        // DO NOT use e.preventDefault() - let the anchor do its job
+        
+        // Hide button
+        jumpBtn.classList.add('hidden');
+        
+        return true; // Allow default behavior
+    }, { passive: true }); // Changed to passive: true
+}
     
     // Apply Safari bottom bar fix after load
     setTimeout(fixSafariBottomBar, 300);
