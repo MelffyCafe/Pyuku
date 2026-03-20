@@ -72,7 +72,6 @@ function updateDarkMode(isDark) {
         // Update body background
         document.body.style.backgroundImage = "url('assets/darkmodeland.jpg')";
         
-        // === ADD THIS ===
         // Update theme-color for mobile browser bars
         let themeColor = document.querySelector('meta[name="theme-color"]');
         if (themeColor) {
@@ -86,7 +85,6 @@ function updateDarkMode(isDark) {
         // Update body background
         document.body.style.backgroundImage = "url('assets/lightmodetree.jpg')";
         
-        // === ADD THIS ===
         // Update theme-color for mobile browser bars
         let themeColor = document.querySelector('meta[name="theme-color"]');
         if (themeColor) {
@@ -94,7 +92,6 @@ function updateDarkMode(isDark) {
         }
     }
 
-    
     // Set background properties on body
     document.body.style.backgroundSize = 'cover';
     document.body.style.backgroundPosition = 'center';
