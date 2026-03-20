@@ -74,27 +74,13 @@ function updateDarkMode(isDark) {
     document.documentElement.style.backgroundAttachment = 'scroll'; // Changed from fixed to scroll
 }
 
-// iOS viewport height fix - COMPREHENSIVE
+// iOS viewport height fix - SIMPLIFIED
 function setVh() {
-    // Get the actual viewport height
-    const vh = window.innerHeight * 0.01;
-    const height = window.innerHeight;
-    const width = window.innerWidth;
-    
-    // Set CSS variables
-    document.documentElement.style.setProperty('--vh', `${vh}px`);
-    document.documentElement.style.setProperty('--window-height', `${height}px`);
-    document.documentElement.style.setProperty('--window-width', `${width}px`);
-    
-    // For iOS specifically, set body height
+    // For iOS specifically, ensure body takes full height
     if (navigator.userAgent.match(/iPhone|iPad|iPod/i)) {
+        const height = window.innerHeight;
         document.body.style.minHeight = height + 'px';
-        
-        // Also ensure html takes full height
         document.documentElement.style.height = height + 'px';
-        
-        // Log for debugging
-        console.log('iOS height set to:', height);
     }
 }
 
@@ -102,27 +88,6 @@ function setVh() {
 setVh();
 window.addEventListener('resize', setVh);
 window.addEventListener('orientationchange', setVh);
-window.addEventListener('scroll', function() {
-    // Debounced scroll handler
-    if (!window.requestAnimationFrame) {
-        setTimeout(setVh, 100);
-    } else {
-        window.requestAnimationFrame(setVh);
-    }
-});
-
-// Additional fix for iOS keyboard showing/hiding
-if (navigator.userAgent.match(/iPhone|iPad|iPod/i)) {
-    window.addEventListener('focusin', function(e) {
-        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-            setTimeout(setVh, 300);
-        }
-    });
-    
-    window.addEventListener('focusout', function() {
-        setTimeout(setVh, 300);
-    });
-}
 
 // Wait for page to load before setting up
 document.addEventListener('DOMContentLoaded', function() {
