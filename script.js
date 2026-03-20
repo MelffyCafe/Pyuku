@@ -69,15 +69,29 @@ function updateDarkMode(isDark) {
         document.body.classList.remove('light');
         document.body.classList.add('dark');
         
-        // Update body background, not html
+        // Update body background
         document.body.style.backgroundImage = "url('assets/darkmodeland.jpg')";
+        
+        // === ADD THIS ===
+        // Update theme-color for mobile browser bars
+        let themeColor = document.querySelector('meta[name="theme-color"]');
+        if (themeColor) {
+            themeColor.setAttribute('content', '#181d2d');
+        }
     } else {
         // Light mode
         document.body.classList.add('light');
         document.body.classList.remove('dark');
         
-        // Update body background, not html
+        // Update body background
         document.body.style.backgroundImage = "url('assets/lightmodetree.jpg')";
+        
+        // === ADD THIS ===
+        // Update theme-color for mobile browser bars
+        let themeColor = document.querySelector('meta[name="theme-color"]');
+        if (themeColor) {
+            themeColor.setAttribute('content', '#ebf0f8');
+        }
     }
     
     // Set background properties on body
