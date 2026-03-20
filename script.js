@@ -50,34 +50,30 @@ window.changeChapter = function(direction) {
 // Function to update dark/light mode
 function updateDarkMode(isDark) {
     if (isDark) {
-        // Dark mode - set on html element
-        document.documentElement.classList.remove('light');
-        document.documentElement.classList.add('dark');
+        // Dark mode
         document.body.classList.remove('light');
         document.body.classList.add('dark');
         
-        // Set background on html (this tints the browser bars)
+        // Update html background (this tints the Safari bars)
         document.documentElement.style.backgroundColor = '#0a0e1a';
         document.documentElement.style.backgroundImage = "url('assets/darkmodeland.jpg')";
         
-        // Body stays transparent
+        // Clear body background so html shows through
         document.body.style.backgroundImage = 'none';
         document.body.style.backgroundColor = 'transparent';
         
         // Update theme-color meta tag for Safari
         updateThemeColor('#0a0e1a');
     } else {
-        // Light mode - set on html element
-        document.documentElement.classList.add('light');
-        document.documentElement.classList.remove('dark');
+        // Light mode
         document.body.classList.add('light');
         document.body.classList.remove('dark');
         
-        // Set background on html (this tints the browser bars)
+        // Update html background (this tints the Safari bars)
         document.documentElement.style.backgroundColor = '#e0e6f0';
         document.documentElement.style.backgroundImage = "url('assets/lightmodetree.jpg')";
         
-        // Body stays transparent
+        // Clear body background so html shows through
         document.body.style.backgroundImage = 'none';
         document.body.style.backgroundColor = 'transparent';
         
@@ -85,7 +81,7 @@ function updateDarkMode(isDark) {
         updateThemeColor('#e0e6f0');
     }
     
-    // Ensure background properties are set on html
+    // Set background properties on html
     document.documentElement.style.backgroundSize = 'cover';
     document.documentElement.style.backgroundPosition = 'center';
     document.documentElement.style.backgroundRepeat = 'no-repeat';
@@ -94,14 +90,16 @@ function updateDarkMode(isDark) {
     const isEdge = /edge\//i.test(navigator.userAgent);
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
     
-    if (isEdge || isIOS) {
+    if (isEdge) {
+        document.documentElement.style.backgroundAttachment = 'scroll';
+    } else if (isIOS) {
         document.documentElement.style.backgroundAttachment = 'scroll';
     } else {
         document.documentElement.style.backgroundAttachment = window.innerWidth > 600 ? 'fixed' : 'scroll';
     }
 }
 
-// Function to update theme color
+// Add this new function to update theme color
 function updateThemeColor(color) {
     let metaThemeColor = document.querySelector('meta[name=theme-color]');
     
@@ -114,7 +112,18 @@ function updateThemeColor(color) {
     metaThemeColor.content = color;
 }
 
-// iOS Safari bottom bar fix - PROVEN WORKING
+// Call it in your DOMContentLoaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Set initial theme color based on saved mode
+    const savedMode = localStorage.getItem('darkMode');
+    if (savedMode === 'light') {
+        updateThemeColor('#e0e6f0');
+    } else {
+        updateThemeColor('#0a0e1a');
+    }
+});
+
+// iOS Safari bottom bar fix - improved
 function fixSafariBottomBar() {
     // Check if Safari on iOS
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
@@ -144,7 +153,7 @@ function fixSafariBottomBar() {
     }
 }
 
-// iOS viewport height fix - SIMPLIFIED AND PROVEN
+// iOS viewport height fix - SIMPLIFIED
 function setVh() {
     // For iOS specifically, ensure body takes full height
     if (navigator.userAgent.match(/iPhone|iPad|iPod/i)) {
@@ -183,15 +192,15 @@ document.addEventListener('DOMContentLoaded', function() {
         darkModeBtn.addEventListener('click', function() {
             console.log('=== BUTTON CLICKED ===');
             
-            // Check if dark class exists on html (meaning we're in dark mode)
-            const isDark = document.documentElement.classList.contains('dark');
+            // Check if light class exists (meaning we're in light mode)
+            const isLight = document.body.classList.contains('light');
             
-            // Update mode - if dark class exists, go to light; if not, go to dark
-            updateDarkMode(!isDark);
+            // Update mode - if light class exists, go to dark; if not, go to light
+            updateDarkMode(isLight);
             
-            console.log('After toggle - Dark class?', document.documentElement.classList.contains('dark'));
+            console.log('After toggle - Light class?', document.body.classList.contains('light'));
             
-            localStorage.setItem('darkMode', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+            localStorage.setItem('darkMode', document.body.classList.contains('light') ? 'light' : 'dark');
             console.log('Local storage saved as:', localStorage.getItem('darkMode'));
         });
     } else {
@@ -219,7 +228,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Setting to dark mode');
     }
     
-    console.log('HTML has dark class?', document.documentElement.classList.contains('dark'));
+    console.log('Body has light class?', document.body.classList.contains('light'));
     console.log('=== END DIAGNOSIS ===\n');
 
     // Load last chapter
@@ -230,71 +239,80 @@ document.addEventListener('DOMContentLoaded', function() {
         window.showChapter(1);
     }
 
-    // JUMP TO TOP - PROVEN IOS FIX
-    const jumpBtn = document.getElementById('jumpToTop');
-    const tocContainer = document.querySelector('.toc-container');
-    let lastScrollY = window.scrollY;
-    let ticking = false;
+// JUMP TO TOP - FIXED FOR MOBILE using scrollingElement
+const jumpBtn = document.getElementById('jumpToTop');
+const tocContainer = document.querySelector('.toc-container');
+let lastScrollY = window.scrollY;
+let ticking = false;
 
-    if (jumpBtn) {
-        function checkScroll() {
-            // Use scrollingElement for better mobile compatibility
-            const scrollTop = document.scrollingElement ? document.scrollingElement.scrollTop : window.scrollY;
+if (jumpBtn) {
+    function checkScroll() {
+        // Use scrollingElement for better mobile compatibility
+        const scrollTop = document.scrollingElement ? document.scrollingElement.scrollTop : window.scrollY;
+        
+        if (tocContainer) {
+            const tocRect = tocContainer.getBoundingClientRect();
             
-            if (tocContainer) {
-                const tocRect = tocContainer.getBoundingClientRect();
-                
-                // Use a more generous threshold for iOS
-                const isPastTOC = tocRect.bottom < 100;
-                const hasScrolledSignificantly = scrollTop > 150;
-                
-                if (isPastTOC || hasScrolledSignificantly) {
-                    jumpBtn.classList.remove('hidden');
-                } else {
-                    jumpBtn.classList.add('hidden');
-                }
+            // Use a more generous threshold for iOS
+            const isPastTOC = tocRect.bottom < 100;
+            const hasScrolledSignificantly = scrollTop > 150;
+            
+            if (isPastTOC || hasScrolledSignificantly) {
+                jumpBtn.classList.remove('hidden');
             } else {
-                if (scrollTop > 150) {
-                    jumpBtn.classList.remove('hidden');
-                } else {
-                    jumpBtn.classList.add('hidden');
-                }
+                jumpBtn.classList.add('hidden');
             }
-            ticking = false;
+        } else {
+            if (scrollTop > 150) {
+                jumpBtn.classList.remove('hidden');
+            } else {
+                jumpBtn.classList.add('hidden');
+            }
         }
-        
-        // Multiple event listeners for iOS
-        window.addEventListener('scroll', function() {
-            if (!ticking) {
-                window.requestAnimationFrame(checkScroll);
-                ticking = true;
-            }
-        });
-        
-        window.addEventListener('touchend', checkScroll);
-        window.addEventListener('resize', checkScroll);
-        
-        // Periodic check for iOS
-        setInterval(checkScroll, 200);
-        
-        // Initial check with delay to ensure DOM is ready
-        setTimeout(checkScroll, 100);
-        checkScroll();
-        
-        // CLICK HANDLER - Let anchor do its job
-        jumpBtn.addEventListener('click', function(e) {
-            // Hide button
-            jumpBtn.classList.add('hidden');
-            return true; // Allow default behavior
-        });
-        
-        // TOUCH HANDLER - passive for iOS performance
-        jumpBtn.addEventListener('touchstart', function(e) {
-            // Hide button
-            jumpBtn.classList.add('hidden');
-            return true; // Allow default behavior
-        }, { passive: true });
+        ticking = false;
     }
+    
+    // Multiple event listeners for iOS
+    window.addEventListener('scroll', function() {
+        if (!ticking) {
+            window.requestAnimationFrame(checkScroll);
+            ticking = true;
+        }
+    });
+    
+    window.addEventListener('touchend', checkScroll);
+    window.addEventListener('resize', checkScroll);
+    
+    // Periodic check for iOS
+    setInterval(checkScroll, 200);
+    
+    // Initial check with delay to ensure DOM is ready
+    setTimeout(checkScroll, 100);
+    checkScroll();
+    
+    // FIXED CLICK HANDLER - REMOVED preventDefault()
+    jumpBtn.addEventListener('click', function(e) {
+        // DO NOT use e.preventDefault() - let the anchor do its job
+        
+        // Hide button
+        jumpBtn.classList.add('hidden');
+        
+        // Let the anchor href="#top-of-page" handle scrolling naturally
+        // No manual scroll code needed
+        
+        return true; // Allow default behavior
+    });
+    
+    // FIXED TOUCH EVENT - REMOVED preventDefault()
+    jumpBtn.addEventListener('touchstart', function(e) {
+        // DO NOT use e.preventDefault() - let the anchor do its job
+        
+        // Hide button
+        jumpBtn.classList.add('hidden');
+        
+        return true; // Allow default behavior
+    }, { passive: true }); // Changed to passive: true
+}
     
     // Apply Safari bottom bar fix after load
     setTimeout(fixSafariBottomBar, 300);
@@ -305,3 +323,4 @@ window.addEventListener('load', function() {
     fixSafariBottomBar();
     setVh();
 });
+
