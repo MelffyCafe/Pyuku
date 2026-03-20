@@ -80,29 +80,30 @@ body.light {
 html {
     height: 100%;
     min-height: 100%;
-    /* Remove the background image from html */
-    background-image: none !important; /* We'll move this to body */
-    background-color: transparent;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed; /* Use fixed for desktop */
+    background-color: #0a0e1a; /* Default dark background color */
 }
 
+/* Light mode background - will be toggled by JS */
+html.light {
+    background-color: #e0e6f0;
+}
+
+/* Dark mode background - will be toggled by JS */
 html.dark {
-    background-image: none !important;
+    background-color: #0a0e1a;
 }
 
 body {
     font-family: 'Lora', 'Georgia', 'Times New Roman', serif;
-    
-    /* Move background to body */
-    background-image: url('assets/lightmodetree.jpg');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed; /* Use fixed for all browsers */
+    background: transparent; /* Make body transparent */
     
     /* Fix height calculation for Edge */
     min-height: 100vh;
     min-height: -webkit-fill-available;
-    min-height: stretch; /* Edge supports this */
     
     /* Display fixes */
     display: flex;
@@ -125,46 +126,24 @@ body {
     -webkit-align-items: center;
 }
 
-body.light {
-    background-image: url('assets/lightmodetree.jpg');
-    color-scheme: light;
-}
-
-body.dark {
-    background-image: url('assets/darkmodeland.jpg');
-    color-scheme: dark;
-}
-
 /* Edge-specific fix */
 @supports (-ms-ime-align:auto) {
-    body {
-        min-height: 100vh;
+    html {
         background-attachment: scroll; /* Edge works better with scroll */
     }
     
     .doc-column {
         margin: 80px auto 20px;
-        /* Ensure column doesn't cause scrolling issues */
         max-width: 760px;
         width: 100%;
     }
 }
 
-/* iOS-specific fixes - keep these but modify */
-@supports (-webkit-touch-callout: none) {
-    body {
-        /* iOS needs different background handling */
-        background-attachment: scroll;
-        min-height: -webkit-fill-available;
-    }
-}
-
-/* iOS-specific viewport fixes - PROVEN FIX */
+/* iOS-specific fixes */
 @supports (-webkit-touch-callout: none) {
     html {
+        background-attachment: scroll; /* iOS needs scroll */
         height: -webkit-fill-available;
-        overflow: hidden;
-        background-attachment: scroll;
     }
     
     body {
@@ -175,8 +154,6 @@ body.dark {
         -webkit-overflow-scrolling: touch;
         padding: 0 1rem;
         padding-bottom: max(1rem, env(safe-area-inset-bottom, 1rem));
-        /* Add safe area padding if needed */
-        padding-bottom: env(safe-area-inset-bottom, 1rem);
     }
     
     /* Ensure fixed elements stay put with safe areas */
