@@ -54,74 +54,34 @@ function updateDarkMode(isDark) {
         document.body.classList.remove('light');
         document.body.classList.add('dark');
         
-        // Update html background (this tints the Safari bars)
-        document.documentElement.style.backgroundColor = '#0a0e1a';
-        document.documentElement.style.backgroundImage = "url('assets/darkmodeland.jpg')";
-        
-        // Clear body background so html shows through
-        document.body.style.backgroundImage = 'none';
-        document.body.style.backgroundColor = 'transparent';
-        
-        // Update theme-color meta tag for Safari
-        updateThemeColor('#0a0e1a');
+        // Update body background, not html
+        document.body.style.backgroundImage = "url('assets/darkmodeland.jpg')";
     } else {
         // Light mode
         document.body.classList.add('light');
         document.body.classList.remove('dark');
         
-        // Update html background (this tints the Safari bars)
-        document.documentElement.style.backgroundColor = '#e0e6f0';
-        document.documentElement.style.backgroundImage = "url('assets/lightmodetree.jpg')";
-        
-        // Clear body background so html shows through
-        document.body.style.backgroundImage = 'none';
-        document.body.style.backgroundColor = 'transparent';
-        
-        // Update theme-color meta tag for Safari
-        updateThemeColor('#e0e6f0');
+        // Update body background, not html
+        document.body.style.backgroundImage = "url('assets/lightmodetree.jpg')";
     }
     
-    // Set background properties on html
-    document.documentElement.style.backgroundSize = 'cover';
-    document.documentElement.style.backgroundPosition = 'center';
-    document.documentElement.style.backgroundRepeat = 'no-repeat';
+    // Set background properties on body
+    document.body.style.backgroundSize = 'cover';
+    document.body.style.backgroundPosition = 'center';
+    document.body.style.backgroundRepeat = 'no-repeat';
     
     // Handle attachment based on browser
     const isEdge = /edge\//i.test(navigator.userAgent);
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
     
     if (isEdge) {
-        document.documentElement.style.backgroundAttachment = 'scroll';
+        document.body.style.backgroundAttachment = 'scroll';
     } else if (isIOS) {
-        document.documentElement.style.backgroundAttachment = 'scroll';
+        document.body.style.backgroundAttachment = 'scroll';
     } else {
-        document.documentElement.style.backgroundAttachment = window.innerWidth > 600 ? 'fixed' : 'scroll';
+        document.body.style.backgroundAttachment = window.innerWidth > 600 ? 'fixed' : 'scroll';
     }
 }
-
-// Add this new function to update theme color
-function updateThemeColor(color) {
-    let metaThemeColor = document.querySelector('meta[name=theme-color]');
-    
-    if (!metaThemeColor) {
-        metaThemeColor = document.createElement('meta');
-        metaThemeColor.name = 'theme-color';
-        document.head.appendChild(metaThemeColor);
-    }
-    
-    metaThemeColor.content = color;
-}
-
-// Call it in your DOMContentLoaded
-document.addEventListener('DOMContentLoaded', function() {
-    // Set initial theme color based on saved mode
-    const savedMode = localStorage.getItem('darkMode');
-    if (savedMode === 'light') {
-        updateThemeColor('#e0e6f0');
-    } else {
-        updateThemeColor('#0a0e1a');
-    }
-});
 
 // iOS Safari bottom bar fix - improved
 function fixSafariBottomBar() {
@@ -323,4 +283,3 @@ window.addEventListener('load', function() {
     fixSafariBottomBar();
     setVh();
 });
-
