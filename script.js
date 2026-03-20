@@ -189,91 +189,111 @@ document.addEventListener('DOMContentLoaded', function() {
         window.showChapter(1);
     }
 
-    // JUMP TO TOP - FIXED FOR MOBILE
-    const jumpBtn = document.getElementById('jumpToTop');
-    const tocContainer = document.querySelector('.toc-container');
-    let lastScrollY = window.scrollY;
-    let ticking = false;
+// JUMP TO TOP - FIXED FOR MOBILE using scrollingElement
+const jumpBtn = document.getElementById('jumpToTop');
+const tocContainer = document.querySelector('.toc-container');
+let lastScrollY = window.scrollY;
+let ticking = false;
 
-    if (jumpBtn) {
-        function checkScroll() {
-            const currentScrollY = window.scrollY;
+if (jumpBtn) {
+    function checkScroll() {
+        // Use scrollingElement for better mobile compatibility
+        const scrollTop = document.scrollingElement ? document.scrollingElement.scrollTop : window.scrollY;
+        
+        if (tocContainer) {
+            const tocRect = tocContainer.getBoundingClientRect();
             
-            if (tocContainer) {
-                const tocRect = tocContainer.getBoundingClientRect();
-                
-                // Use a more generous threshold for iOS
-                const isPastTOC = tocRect.bottom < 100;
-                const hasScrolledSignificantly = currentScrollY > 150;
-                
-                if (isPastTOC || hasScrolledSignificantly) {
-                    jumpBtn.classList.remove('hidden');
-                } else {
-                    jumpBtn.classList.add('hidden');
-                }
-                
-                lastScrollY = currentScrollY;
+            // Use a more generous threshold for iOS
+            const isPastTOC = tocRect.bottom < 100;
+            const hasScrolledSignificantly = scrollTop > 150;
+            
+            if (isPastTOC || hasScrolledSignificantly) {
+                jumpBtn.classList.remove('hidden');
             } else {
-                if (window.scrollY > 150) {
-                    jumpBtn.classList.remove('hidden');
-                } else {
-                    jumpBtn.classList.add('hidden');
-                }
+                jumpBtn.classList.add('hidden');
             }
-            ticking = false;
+        } else {
+            if (scrollTop > 150) {
+                jumpBtn.classList.remove('hidden');
+            } else {
+                jumpBtn.classList.add('hidden');
+            }
+        }
+        ticking = false;
+    }
+    
+    // Multiple event listeners for iOS
+    window.addEventListener('scroll', function() {
+        if (!ticking) {
+            window.requestAnimationFrame(checkScroll);
+            ticking = true;
+        }
+    });
+    
+    window.addEventListener('touchend', checkScroll);
+    window.addEventListener('resize', checkScroll);
+    
+    // Periodic check for iOS
+    setInterval(checkScroll, 200);
+    
+    // Initial check with delay to ensure DOM is ready
+    setTimeout(checkScroll, 100);
+    checkScroll();
+    
+    // FIXED CLICK HANDLER using scrollingElement
+    jumpBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        // Hide button
+        jumpBtn.classList.add('hidden');
+        
+        // Use scrollingElement for maximum compatibility
+        if (document.scrollingElement) {
+            // Modern approach
+            document.scrollingElement.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        } else {
+            // Fallback
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
         }
         
-        // Multiple event listeners for iOS
-        window.addEventListener('scroll', function() {
-            if (!ticking) {
-                window.requestAnimationFrame(checkScroll);
-                ticking = true;
+        return false;
+    });
+    
+    // Touch event for mobile
+    jumpBtn.addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // Hide button
+        jumpBtn.classList.add('hidden');
+        
+        // Immediate scroll for mobile
+        if (document.scrollingElement) {
+            document.scrollingElement.scrollTop = 0;
+            // Also try smooth scroll
+            try {
+                document.scrollingElement.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            } catch (e) {
+                // Fallback if smooth scroll fails
+                document.scrollingElement.scrollTop = 0;
             }
-        });
+        } else {
+            document.documentElement.scrollTop = 0;
+            document.body.scrollTop = 0;
+        }
         
-        window.addEventListener('touchend', checkScroll);
-        window.addEventListener('resize', checkScroll);
-        
-        // Periodic check for iOS
-        setInterval(checkScroll, 200);
-        
-        // Initial check with delay to ensure DOM is ready
-        setTimeout(checkScroll, 100);
-        checkScroll();
-        
-        // FIXED CLICK HANDLER - works on mobile
-        jumpBtn.addEventListener('click', function(e) {
-            e.preventDefault(); // Prevent any default behavior
-            
-            // Force hide the button immediately for better UX
-            jumpBtn.classList.add('hidden');
-            
-            // Scroll to top
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
-            
-            return false; // Prevent event bubbling
-        });
-        
-        // ADD TOUCH EVENT specifically for mobile
-        jumpBtn.addEventListener('touchstart', function(e) {
-            e.preventDefault(); // Prevent default touch behavior
-            e.stopPropagation(); // Stop event bubbling
-            
-            // Force hide the button immediately
-            jumpBtn.classList.add('hidden');
-            
-            // Scroll to top
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
-            
-            return false;
-        }, { passive: false }); // Important: passive: false allows preventDefault
-    }
+        return false;
+    }, { passive: false });
+}
     
     // Apply Safari bottom bar fix after load
     setTimeout(fixSafariBottomBar, 300);
