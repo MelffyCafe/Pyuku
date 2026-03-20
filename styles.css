@@ -79,9 +79,6 @@ body.light {
 html {
     height: 100%;
     min-height: 100%;
-    /* Remove the background image from html */
-    background-image: none; /* We'll move this to body */
-    background-color: transparent;
 }
 
 @media (max-width: 600px) {
@@ -103,6 +100,7 @@ body {
     background-position: center;
     background-repeat: no-repeat;
     background-attachment: fixed; /* Use fixed for all browsers */
+    background-color: #0a0e1a;  /* dark fallback */
     
     /* Fix height calculation for Edge */
     min-height: 100vh;
@@ -132,10 +130,12 @@ body {
 
 body.light {
     background-image: url('assets/lightmodetree.jpg');
+    background-color: #e0e6f0;  /* ADD THIS - light fallback */
 }
 
 body.dark {
     background-image: url('assets/darkmodeland.jpg');
+    background-color: #0a0e1a;  /* ADD THIS - dark fallback */
 }
 
 /* Edge-specific fix */
