@@ -79,6 +79,8 @@ body.light {
 html {
     height: 100%;
     min-height: 100%;
+    scroll-padding-top: 20px; /* Adjust this value as needed */
+    scroll-behavior: smooth; /* This adds smooth scrolling */
 }
 
 @media (max-width: 600px) {
@@ -89,6 +91,14 @@ html {
     body {
         min-height: 100%;
     }
+}
+
+#echoverie {
+    scroll-margin-top: 20px;
+    display: block;
+    /* This ensures the element is there but doesn't affect layout */
+    height: 0;
+    overflow: visible;
 }
 
 body {
@@ -402,22 +412,18 @@ body.dark {
     background-color: var(--toc-bg);
     border-radius: 28px;
     
-    /* FIXED: Responsive padding for TOC */
     padding: 1.5rem 2rem;
     
     @media (max-width: 600px) {
         padding: 1.25rem 1.25rem;
         border-radius: 20px;
-        margin-bottom: 1.8rem; /* Reduced from 2.8rem */
     }
     
     @media (max-width: 400px) {
         padding: 1rem 1rem;
         border-radius: 16px;
-        margin-bottom: 1.5rem;
     }
     
-    margin-bottom: 2.8rem;
 }
 
 .toc-container h2 {
@@ -511,7 +517,7 @@ body.dark .chapter-link:hover {
 }
 
 .chapter-view {
-    margin: 1.8rem 0;
+margin: 0;
 }
 
 /* Mobile chapter view */
@@ -526,6 +532,7 @@ body.dark .chapter-link:hover {
     font-weight: 400;
     font-size: 2rem;
     margin-bottom: 1rem;
+    margin-top: 2rem;
     border-bottom: 1px dashed var(--accent-line);
     padding-bottom: 0.5rem;
     text-transform: capitalize;
