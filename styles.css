@@ -81,9 +81,7 @@ html {
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    /* Critical: Use scroll instead of fixed for iOS */
     background-attachment: scroll;
-    /* Ensure proper rendering */
     -webkit-text-size-adjust: 100%;
 }
 
@@ -91,10 +89,23 @@ html.dark {
     background-image: url('assets/darkmodeland.jpg');
 }
 
-/* ADD THIS NEW SECTION for desktop fixed background */
+/* Desktop fixed background */
 @media (min-width: 601px) {
     html {
         background-attachment: fixed;
+    }
+}
+
+/* Edge-specific fix */
+@supports (-ms-ime-align: auto) {
+    html {
+        background-attachment: scroll !important;
+        background-size: cover !important;
+    }
+    
+    body {
+        position: relative;
+        min-height: 100vh;
     }
 }
 
