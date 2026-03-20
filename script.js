@@ -93,6 +93,7 @@ function updateDarkMode(isDark) {
             themeColor.setAttribute('content', '#ebf0f8');
         }
     }
+
     
     // Set background properties on body
     document.body.style.backgroundSize = 'cover';
