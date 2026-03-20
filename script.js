@@ -50,36 +50,33 @@ window.changeChapter = function(direction) {
 // Function to update dark/light mode
 function updateDarkMode(isDark) {
     if (isDark) {
-        // Dark mode
+        // Dark mode - remove light class
+        document.documentElement.classList.remove('light');
         document.body.classList.remove('light');
-        document.body.classList.add('dark');
         
-        // Update body background, not html
-        document.body.style.backgroundImage = "url('assets/darkmodeland.jpg')";
+        // Set dark background
+        document.documentElement.style.backgroundColor = '#0a0e1a';
+        document.documentElement.style.backgroundImage = "url('assets/darkmodeland.jpg')";
     } else {
-        // Light mode
+        // Light mode - add light class
+        document.documentElement.classList.add('light');
         document.body.classList.add('light');
-        document.body.classList.remove('dark');
         
-        // Update body background, not html
-        document.body.style.backgroundImage = "url('assets/lightmodetree.jpg')";
+        // Set light background
+        document.documentElement.style.backgroundColor = '#e0e6f0';
+        document.documentElement.style.backgroundImage = "url('assets/lightmodetree.jpg')";
     }
     
-    // Set background properties on body
-    document.body.style.backgroundSize = 'cover';
-    document.body.style.backgroundPosition = 'center';
-    document.body.style.backgroundRepeat = 'no-repeat';
+    // Ensure background properties are set
+    document.documentElement.style.backgroundSize = 'cover';
+    document.documentElement.style.backgroundPosition = 'center';
+    document.documentElement.style.backgroundRepeat = 'no-repeat';
     
-    // Handle attachment based on browser
-    const isEdge = /edge\//i.test(navigator.userAgent);
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-    
-    if (isEdge) {
-        document.body.style.backgroundAttachment = 'scroll';
-    } else if (isIOS) {
-        document.body.style.backgroundAttachment = 'scroll';
+    // Use fixed on desktop, scroll on mobile
+    if (window.innerWidth > 600) {
+        document.documentElement.style.backgroundAttachment = 'fixed';
     } else {
-        document.body.style.backgroundAttachment = window.innerWidth > 600 ? 'fixed' : 'scroll';
+        document.documentElement.style.backgroundAttachment = 'scroll';
     }
 }
 
